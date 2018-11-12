@@ -3,8 +3,8 @@ package dota2
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -14,7 +14,7 @@ const (
 	GET_MATCH_HISTORY            string = "IDOTA2Match_570/GetMatchHistory/v001/"
 	GET_MATCH_HISTORY_BY_SEQ_NUM string = "IDOTA2Match_570/GetMatchHistoryBySequenceNum/v0001/"
 	GET_MATCH_DETAILS            string = "IDOTA2Match_570/GetMatchDetails/v001/"
-	GET_LEAGUE_LISTING           string = "IDOTA2Match_570/GetLeagueListing/v0001/"
+	GET_LEAGUE_LISTING           string = "IDOTA2Match_205790/GetLeagueListing/v0001/"
 	GET_LIVE_LEAGUE_GAMES        string = "IDOTA2Match_570/GetLiveLeagueGames/v0001/"
 	GET_TEAM_INFO_BY_TEAM_ID     string = "IDOTA2Match_570/GetTeamInfoByTeamID/v001/"
 	GET_PLAYER_SUMMARIES         string = "ISteamUser/GetPlayerSummaries/v0002/"
@@ -108,21 +108,15 @@ func (d *Dota2api) GetMatchHistory(accountid string) (MatchHistory, error) {
 	if !found {
 		return mh, URLMapError
 	}
-	resp, err := http.Get(url + "?key=" + d.apikey + "&account_id=" + accountid)
+
+	formurl := url + "?key=" + d.apikey + "&account_id=" + accountid
+	bmatchhistory, err := d.RequestForURL(formurl)
 	if err != nil {
 		return mh, err
 	}
-	defer resp.Body.Close()
 
-	var mhbyte []byte
 	var mhwrap MatchHistoryWrapper
-	mhbyte, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return mh, err
-	}
-	//fmt.Printf("byte:\n%s\n", mhbyte)
-
-	err = json.Unmarshal(mhbyte, &mhwrap)
+	err = json.Unmarshal(bmatchhistory, &mhwrap)
 	if err != nil {
 		return mh, err
 	}
@@ -138,21 +132,14 @@ func (d *Dota2api) GetMatchDetails(matchid string) (MatchDetail, error) {
 		return mdetail, URLMapError
 	}
 
-	fmt.Println("url= ", url)
-	resp, err := d.client.Get(url + "?key=" + d.apikey + "&match_id=" + matchid)
-	if err != nil {
-		return mdetail, err
-	}
-	defer resp.Body.Close()
-
-	var byresult []byte
-	byresult, err = ioutil.ReadAll(resp.Body)
+	formurl := url + "?key=" + d.apikey + "&match_id=" + matchid
+	bmatchdetail, err := d.RequestForURL(formurl)
 	if err != nil {
 		return mdetail, err
 	}
 
 	var mdetailwrp MatchDetailWrapper
-	err = json.Unmarshal(byresult, &mdetailwrp)
+	err = json.Unmarshal(bmatchdetail, &mdetailwrp)
 	if err != nil {
 		return mdetail, err
 	}
@@ -163,6 +150,28 @@ func (d *Dota2api) GetMatchDetails(matchid string) (MatchDetail, error) {
 //GetLeagueListing will get a list of leagues which can be viewed within DotaTV.
 func (d *Dota2api) GetLeagueListing() (LeagueList, error) {
 	var leagues LeagueList
+
+	url, found := URLMap["GetLeagueListing"]
+	if !found {
+		return leagues, URLMapError
+	}
+
+	formurl := url + "?key=" + d.apikey
+	log.Printf("formurl=%s\n", formurl)
+	bleagues, err := d.RequestForURL(formurl)
+	if err != nil {
+		return leagues, err
+	}
+	//log.Printf("bytes->\n%s\n", bleagues)
+
+	var leaguelistwrapper LeagueListWrapper
+	err = json.Unmarshal(bleagues, &leaguelistwrapper)
+	if err != nil {
+		return leagues, err
+	}
+
+	leagues = leaguelistwrapper.League
+
 	return leagues, nil
 
 }
@@ -180,20 +189,14 @@ func (d *Dota2api) GetPlayerSummaries(steamids string) (PlayerSummaryList, error
 		return plsummarylist, URLMapError
 	}
 
-	resp, err := d.client.Get(url + "?key=" + d.apikey + "&steamids=" + steamids)
-	if err != nil {
-		return plsummarylist, err
-	}
-	defer resp.Body.Close()
-
-	var plyby []byte
-	plyby, err = ioutil.ReadAll(resp.Body)
+	formurl := url + "?key=" + d.apikey + "&steamids=" + steamids
+	bplayersummary, err := d.RequestForURL(formurl)
 	if err != nil {
 		return plsummarylist, err
 	}
 
 	var playersmrwrp PlayerSummaryWrapper
-	err = json.Unmarshal(plyby, &playersmrwrp)
+	err = json.Unmarshal(bplayersummary, &playersmrwrp)
 	if err != nil {
 		return plsummarylist, err
 	}
@@ -214,20 +217,14 @@ func (d *Dota2api) GetFriendList(steamid string, relationship string) ([]FriendI
 		return friendlist, URLMapError
 	}
 
-	resp, err := d.client.Get(url + "?key=" + d.apikey + "&steamid=" + steamid + "&relationship=" + relationship)
-	if err != nil {
-		return friendlist, err
-	}
-	defer resp.Body.Close()
-
-	var flbyte []byte
-	flbyte, err = ioutil.ReadAll(resp.Body)
+	formurl := url + "?key=" + d.apikey + "&steamid=" + steamid + "&relationship=" + relationship
+	bfriendlist, err := d.RequestForURL(formurl)
 	if err != nil {
 		return friendlist, err
 	}
 
 	var frdlistwrap FriendListWrapper
-	err = json.Unmarshal(flbyte, &frdlistwrap)
+	err = json.Unmarshal(bfriendlist, &frdlistwrap)
 	if err != nil {
 		return friendlist, err
 
@@ -245,23 +242,61 @@ func (d *Dota2api) GetServerInfo() (ServerInfo, error) {
 		return srvinfo, URLMapError
 	}
 
-	resp, err := d.client.Get(url)
-	if err != nil {
-		return srvinfo, err
-	}
-	defer resp.Body.Close()
-
-	var sibyte []byte
-	sibyte, err = ioutil.ReadAll(resp.Body)
+	bsrvinfo, err := d.RequestForURL(url)
 	if err != nil {
 		return srvinfo, err
 	}
 
-	err = json.Unmarshal(sibyte, &srvinfo)
+	err = json.Unmarshal(bsrvinfo, &srvinfo)
 	if err != nil {
 		return srvinfo, err
 	}
 
 	return srvinfo, nil
+}
 
+//GetLiveLeagueGames will return list of the detailed and real-time statistics of the games which are being played.
+func (d *Dota2api) GetLiveLeagueGames() (LeagueGames, error) {
+	var (
+		leaguegameswarp LeagueGamesWrapper
+		leaguegames     LeagueGames
+	)
+	url, found := URLMap["GetLiveLeagueGames"]
+	if !found {
+		return leaguegames, URLMapError
+	}
+
+	formurl := url + "?key=" + d.apikey
+	log.Println("formurl->", formurl)
+	bleagues, err := d.RequestForURL(formurl)
+	if err != nil {
+		return leaguegames, err
+	}
+	log.Printf("bleages->\n%s", bleagues)
+
+	err = json.Unmarshal(bleagues, &leaguegameswarp)
+	if err != nil {
+		return leaguegames, err
+	}
+
+	leaguegames = leaguegameswarp.LgGames
+	return leaguegames, nil
+
+}
+
+//RequestForURL will send http request to url and return the result with []byte
+func (d *Dota2api) RequestForURL(url string) ([]byte, error) {
+	var bresp []byte
+	resp, err := d.client.Get(url)
+	if err != nil {
+		return bresp, err
+	}
+	defer resp.Body.Close()
+
+	bresp, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return bresp, err
+	}
+
+	return bresp, nil
 }

@@ -134,7 +134,108 @@ type PickBanItem [PICKBANCOUNT]map[string]interface{}
 
 type PlayerStatistic [PLAYERCOUNT]map[string]interface{}
 
+type LeagueListWrapper struct {
+	League LeagueList `json:"result"`
+}
+
 type LeagueList struct {
+	Leagues []struct {
+		Name          string `json:"name"`           //Name of the league
+		LeagueID      int    `json:"leagueid"`       //Unique league ID
+		Description   string `json:"description"`    //Description of the league
+		TournamentURL string `json:"tournament_url"` //League website information
+		ItemDef       int    `json:"itemdef"`        //ID for an item associated with the tournament
+	} `json:"leagues"`
+}
+
+type LeagueGamesWrapper struct {
+	LgGames LeagueGames `json:"result"`
+}
+
+type LeagueGames struct {
+	Leagues []LeagueGame `json:"games"`
+	Status  uint16       `json:"status"`
+}
+
+type LeagueGame struct {
+	Players []struct {
+		AccountID uint64 `json:"account_id"`
+		Name      string `json:"name"`
+		HeroID    uint16 `json:"hero_id"`
+		Team      uint8  `json:"team"`
+	} `json:"players"`
+
+	RadiantTeam struct {
+		TeamName string `json:"team_name"`
+		TeamID   uint64 `json:"team_id"`
+		TeamLogo uint64 `json:"team_logo"`
+		Complete bool   `json:"complete"`
+	} `json:"radiant_team"`
+
+	DireTeam struct {
+		TeamName string `json:"team_name"`
+		TeamID   uint64 `json:"team_id"`
+		TeamLogo uint64 `json:"team_logo"`
+		Complete bool   `json:"complete"`
+	} `json:"dire_team"`
+
+	LobbyID           uint64 `json:"lobby_id"`
+	MatchID           uint64 `json:"match_id"`
+	Spectators        uint32 `json:"spectators"`
+	LeagueID          uint64 `json:"league_id"`
+	LeagueNodeID      uint64 `json:"league_node_id"`
+	StreamDelaySec    uint   `json:"stream_delay_s"`
+	RadiantSeriesWins uint   `json:"radiant_series_wins"`
+	DireSeriesWins    uint   `json:"dire_series_wins"`
+	SeriesType        uint   `json:"series_type"`
+	ScoreBoard        struct {
+		Duration           float64       `json:"duration"`
+		RoshanRespawnTimer int           `json:"roshan_respawn_timer"`
+		Radiant            TeamStatistic `json:"radiant"`
+		Dire               TeamStatistic `json:"dire"`
+	} `json:"scoreboard"`
+}
+
+type TeamStatistic struct {
+	Score         uint16 `json:"score"`
+	TowerState    int64  `json:"tower_state"`
+	BarracksState int32  `json:"barracks_state"`
+	Picks         []struct {
+		HeroID uint16 `json:"hero_id"`
+	} `json:"picks"`
+	Bans []struct {
+		HeroID uint16 `json:"hero_id"`
+	} `json:"bans"`
+	Players []struct {
+		PlayerSlot       uint8   `json:"player_slot"`
+		AccountID        uint64  `json:"account_id"`
+		HeroID           uint16  `json:"hero_id"`
+		Kills            uint16  `json:"kills"`
+		Death            uint16  `json:"death"`
+		Assists          uint16  `json:"assists"`
+		LastHits         uint16  `json:"last_hits"`
+		Denies           uint16  `json:"denies"`
+		Gold             uint32  `json:"gold"`
+		Level            uint16  `json:"level"`
+		GoldPerMin       uint16  `json:"gold_per_min"`
+		XpPerMin         uint16  `json:"xp_per_min"`
+		UltimateState    uint8   `json:"ultimate_state"`
+		UltimateCoolDown uint8   `json:"ultimate_cooldown"`
+		Item0            uint16  `json:"item0"`
+		Item1            uint16  `json:"item1"`
+		Item2            uint16  `json:"item2"`
+		Item3            uint16  `json:"item3"`
+		Item4            uint16  `json:"item4"`
+		Item5            uint16  `json:"item5"`
+		RespawnTimer     uint16  `json:"respawn_timer"`
+		PositionX        float32 `json:"position_x"`
+		PositionY        float32 `json:"position_y"`
+		NetWorth         uint32  `json:"net_worth"`
+	} `json:"players"`
+	Abilities []struct {
+		AbilityID    uint16 `json:"ability_id"`
+		AbilityLevel uint8  `json:"ability_level"`
+	} `json:"abilities"`
 }
 
 type PlayerSummaryWrapper struct {
