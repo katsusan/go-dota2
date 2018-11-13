@@ -27,10 +27,10 @@ func main() {
     if err != nil {
         //....
     }
-    fmt.Println("天辉队伍：",matchdetail.DireName)
-    fmt.Println("夜魇队伍：",matchdetail.RadiantName)
-    fmt.Println("比赛时长(s)：",matchdetail.Duration)
-    fmt.Println("一血时间(s)：",matchdetail.FirstBloodTime)
+    fmt.Println("天辉队伍：",matchdetail.RadiantName)  //PSG.LGD
+    fmt.Println("夜魇队伍：",matchdetail.DireName)  //OG
+    fmt.Println("比赛时长(s)：",matchdetail.Duration) //2188
+    fmt.Println("一血时间(s)：",matchdetail.FirstBloodTime) //153
 }
 
 ```
