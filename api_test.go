@@ -117,6 +117,7 @@ func TestGetLeagueListing(t *testing.T) {
 	if err != nil {
 		t.Errorf("GetLeagueListing failed.%s\n", err)
 	}
+	log.Printf("leagues->\n%+v", leagues.Leagues)
 
 	//Look for TI8:
 	//		"Name":"#DOTA_Item_The_International_2018",
@@ -148,10 +149,11 @@ func TestGetLiveLeagueGames(t *testing.T) {
 	if err != nil {
 		t.Errorf("GetLiveLeagueGames failed.%s\n", err)
 	}
-	//log.Printf("leagues->\n%+v\n", leagues.Leagues)
-	for i := 0; i < len(leagues.Leagues); i++ {
-		log.Printf("leagues[%d]->\n%+v\n", i, leagues.Leagues[i])
+
+	if leagues.Status == 200 && len(leagues.Leagues) == 0 {
+		t.Errorf("Got response(status=200) but no parse results.\n")
 	}
+
 }
 
 func TestGetServerInfo(t *testing.T) {

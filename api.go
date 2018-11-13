@@ -8,7 +8,15 @@ import (
 	"net/http"
 )
 
-//string : summary of steam API urls
+//summary of steam API urls
+//IDOTA2Match_205790:	Dota2 Beta TEST API
+//IDOTA2Match_570:	 Dota2 Beta API
+//**some other data**:
+//steamapps\common\dota 2 beta\dota\scripts\npc\
+//	Item data: items.txt
+//	Ability data: npc_abilities.txt
+//	Hero data: npc_heroes.txt
+//	Units data: npc_units.txt
 const (
 	BASE_URL                     string = "http://api.steampowered.com/"
 	GET_MATCH_HISTORY            string = "IDOTA2Match_570/GetMatchHistory/v001/"
@@ -272,7 +280,7 @@ func (d *Dota2api) GetLiveLeagueGames() (LeagueGames, error) {
 	if err != nil {
 		return leaguegames, err
 	}
-	log.Printf("bleages->\n%s", bleagues)
+	//log.Printf("bleages->\n%s", bleagues)
 
 	err = json.Unmarshal(bleagues, &leaguegameswarp)
 	if err != nil {

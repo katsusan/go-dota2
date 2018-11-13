@@ -232,10 +232,10 @@ type TeamStatistic struct {
 		PositionY        float32 `json:"position_y"`
 		NetWorth         uint32  `json:"net_worth"`
 	} `json:"players"`
-	Abilities []struct {
+	/*Abilities []struct {  //由于Valve返回不规范的json格式，此处会返回0-5个重复的Abilities键，暂且不解析
 		AbilityID    uint16 `json:"ability_id"`
 		AbilityLevel uint8  `json:"ability_level"`
-	} `json:"abilities"`
+	} `json:"abilities"`*/
 }
 
 type PlayerSummaryWrapper struct {
