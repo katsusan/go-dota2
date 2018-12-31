@@ -37,11 +37,11 @@ func main() {
 
 ## Supported API ##
 - GetMatchHistory(根据指定账号ID获取历史比赛)
-  - [x] Status (状态码，意义未知)
-  - [x] ResultNum (本次响应中的比赛数量)
-  - [x] TotalNum  (单次查询的总比赛数)
-  - [x] RemainNum (后续查询会返回的比赛数)
-  - [x] Matches (简易比赛信息，参照MatchInfo)
+    - [x] Status (状态码，意义未知)
+    - [x] ResultNum (本次响应中的比赛数量)
+    - [x] TotalNum  (单次查询的总比赛数)
+    - [x] RemainNum (后续查询会返回的比赛数)
+    - [x] Matches (简易比赛信息，参照MatchInfo)
         - [x] MatchID (比赛ID)
         - [x] StartTime (开始时间)
         - [x] LobbyType (比赛类型)
